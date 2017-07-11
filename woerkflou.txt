@@ -1,1 +1,13 @@
-Einmal schauen, was sich tut.
+git clone https://www.github.com/$USER/$REPO
+
+git remote add upstream https://www.github.com/$PROJEKT/$REPO
+
+git remote update --prune
+
+git rebase upstream/staging
+
+git push origin staging
+
+git checkout -b fixBranch
+
+git push origin fixBranch
