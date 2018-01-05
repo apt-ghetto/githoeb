@@ -10,4 +10,4 @@ git push origin staging
 
 git checkout -b fixBranch
 
-git push origin fixBranch
+git push origin fixBranch # --force
