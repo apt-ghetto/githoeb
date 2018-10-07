@@ -1,0 +1,24 @@
+body {
+    background: #FFDEAD;
+    font-size: 2em;
+}
+
+h1, h2, h3 {
+    text-align: center;
+}
+
+.rechts {
+    float: right;
+}
+
+img {
+    display: block;
+    max-height: 50vh;
+    margin: auto;
+}
+
+th, td {
+    padding: 5px;
+    marging: 5px;
+    vertical-align: middle;
+}
