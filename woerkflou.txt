@@ -4,9 +4,9 @@ git remote add upstream https://www.github.com/$PROJEKT/$REPO
 
 git remote update --prune
 
-git rebase upstream/staging
+git rebase upstream/master
 
-git push origin staging
+git push origin master
 
 git checkout -b fixBranch
 
