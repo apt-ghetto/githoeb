@@ -44,6 +44,7 @@
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 
 (elpy-enable)
+(ivy-mode 1)
 
 ;;
 ;; C++
@@ -52,7 +53,6 @@
 (modern-c++-font-lock-global-mode t)
 (require 'clang-format)
 (global-set-key (kbd "C-c C-f") 'clang-format-region)
-(ivy-mode 1)
 ;; counsel-etags
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (require 'counsel-etags)
@@ -97,7 +97,6 @@
               '(:with company-yasnippet))))
 
   :init (global-company-mode t)
-  :config
 )
 
 ;; Code-comprehensive server
