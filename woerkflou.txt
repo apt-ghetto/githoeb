@@ -11,3 +11,9 @@ git push origin master
 git checkout -b fixBranch
 
 git push origin fixBranch # --force
+
+#################################################################
+
+sbuild-update -udc eoan-amd64
+
+sbuild -d eoan-amd64
