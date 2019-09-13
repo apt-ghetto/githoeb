@@ -17,3 +17,11 @@ git push origin fixBranch # --force
 sbuild-update -udc eoan-amd64
 
 sbuild -d eoan-amd64
+
+
+#################################################################
+
+git add .
+arc diff
+
+arc patch D99 --nobranch
