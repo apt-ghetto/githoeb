@@ -14,6 +14,8 @@ git push origin fixBranch # --force
 
 #################################################################
 
+mk-sbuild focal
+
 sbuild-update -udc eoan-amd64
 
 sbuild -d eoan-amd64
