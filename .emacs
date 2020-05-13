@@ -21,9 +21,10 @@
  '(custom-enabled-themes (quote (manoj-dark)))
  '(erc-nick "apt-ghetto")
  '(global-linum-mode t)
+ '(column-number-mode 1)
  '(package-selected-packages
    (quote
-    (flycheck company-ycmd ycmd magit modern-cpp-font-lock elpy))))
+    (counsel-etags flycheck-ycmd flycheck company-ycmd ycmd magit modern-cpp-font-lock elpy))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -32,19 +33,30 @@
  ;; If there is more than one, they won't work right.
  )
 
+;; Increment Garbage collection during initialisation
+(setq gc-cons-threshold 64000000)
+(add-hook 'after-init-hook #'(lambda ()
+                               ;; restore after startup
+                               (setq gc-cons-threshold 800000)))
 
 ;; Perl Development Environment
 (add-to-list 'load-path "~/.emacs.d/pde/lisp")
 (load "pde-load")
 
+;; Use-package
+(eval-when-compile
+  (require 'use-package))
+
 
 ;; Elpy and Magit
-(require 'package)
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-
-(elpy-enable)
-(ivy-mode 1)
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable)
+  :config
+  (setq elpy-rpc-python-command "python3"))
 
 ;;
 ;; C++
@@ -53,9 +65,12 @@
 (modern-c++-font-lock-global-mode t)
 (require 'clang-format)
 (global-set-key (kbd "C-c C-f") 'clang-format-region)
+(use-package swiper)
+(use-package ivy
+  :config
+  (ivy-mode 1))
 ;; counsel-etags
-(add-to-list 'load-path "~/.emacs.d/lisp/")
-(require 'counsel-etags)
+(use-package counsel-etags)
 
 ;; Snippets
 (use-package yasnippet
@@ -97,6 +112,7 @@
               '(:with company-yasnippet))))
 
   :init (global-company-mode t)
+  :config
 )
 
 ;; Code-comprehensive server
@@ -104,7 +120,7 @@
   :commands ycmd-mode
   :init (add-hook 'c++-mode-hook #'ycmd-mode)
   :config
-  (set-variable 'ycmd-server-command '("python3" "/home/gerry/programmieren/ycmd/ycmd/ycmd/"))
+  (set-variable 'ycmd-server-command '("python3" "/home/gerry/ycmd/ycmd/"))
   (set-variable 'ycmd-global-config (expand-file-name "~/.ycm_extra_conf.py"))
   (set-variable 'ycmd-extra-conf-whitelist '("~/.ycm_extra_conf.py")))
 
