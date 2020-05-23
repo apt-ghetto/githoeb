@@ -18,13 +18,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(column-number-mode 1)
  '(custom-enabled-themes (quote (manoj-dark)))
  '(erc-nick "apt-ghetto")
  '(global-linum-mode t)
- '(column-number-mode 1)
  '(package-selected-packages
    (quote
-    (counsel-etags flycheck-ycmd flycheck company-ycmd ycmd magit modern-cpp-font-lock elpy))))
+    (auctex swiper counsel-etags flycheck-ycmd flycheck company-ycmd ycmd magit modern-cpp-font-lock elpy))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -63,8 +63,8 @@
 ;;
 (require 'modern-cpp-font-lock)
 (modern-c++-font-lock-global-mode t)
-(require 'clang-format)
-(global-set-key (kbd "C-c C-f") 'clang-format-region)
+;;(require 'clang-format)
+;;(global-set-key (kbd "C-c C-f") 'clang-format-region)
 (use-package swiper)
 (use-package ivy
   :config
@@ -139,5 +139,9 @@
   :diminish eldoc-mode
   :init (add-hook 'ycmd-mode-hook 'ycmd-eldoc-setup))
 
+;; Company mode auto-completion for AUCTeX
+(use-package company-auctex
+  :after (auctex company)
+  :config (company-auctex-init))
 
 ;;; .emacs ends here
