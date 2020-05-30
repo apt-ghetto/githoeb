@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use 5.010;
+
+my %configs;
+my $index = 0;
+my $device = 'wlp0s20f3';
+
+# Initialise configs
+foreach (glob '/etc/wpa_supplicant/*conf') {
+    $configs{$index} = $_;
+    $index++;
+}
+
+# Print the paths of the found configuration files
+sub printConfigs {
+    foreach $index (sort keys %configs) {
+        say "$index: $configs{$index}";
+    }
+}
+
+sub startWpaSupplicant {
+    &printConfigs;
+    print "Konfiguration wählen: ";
+    chomp($index = <STDIN>);
+    my $configPath = $configs{$index};
+    if (defined $configPath) {
+        system("sudo wpa_supplicant -B -i $device -c $configPath") == 0
+            or die "\nERROR, ein Problem ist aufgetreten: $?\n";
+    } else {
+        say "Ungültige Konfiguration: Eintrag für $index existiert nicht";
+    }
+}
+
+startWpaSupplicant;
