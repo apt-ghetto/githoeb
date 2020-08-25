@@ -24,7 +24,7 @@
  '(global-linum-mode t)
  '(package-selected-packages
    (quote
-    (auctex swiper counsel-etags flycheck-ycmd flycheck company-ycmd ycmd magit modern-cpp-font-lock elpy))))
+    (hydra auctex swiper counsel-etags flycheck-ycmd flycheck company-ycmd ycmd magit modern-cpp-font-lock elpy))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -39,6 +39,10 @@
                                ;; restore after startup
                                (setq gc-cons-threshold 800000)))
 
+;; MELPA archive
+(add-to-list 'package-archives
+	     '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+
 ;; Perl Development Environment
 (add-to-list 'load-path "~/.emacs.d/pde/lisp")
 (load "pde-load")
@@ -49,8 +53,6 @@
 
 
 ;; Elpy and Magit
-(add-to-list 'package-archives
-             '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (use-package elpy
   :ensure t
   :init
