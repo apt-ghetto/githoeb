@@ -18,13 +18,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(column-number-mode 1)
- '(custom-enabled-themes (quote (manoj-dark)))
+ '(column-number-mode t)
+ '(custom-enabled-themes '(manoj-dark))
+ '(doc-view-continuous nil)
  '(erc-nick "apt-ghetto")
  '(global-linum-mode t)
  '(package-selected-packages
-   (quote
-    (hydra auctex swiper counsel-etags flycheck-ycmd flycheck company-ycmd ycmd magit modern-cpp-font-lock elpy))))
+   '(company-auctex flycheck-ycmd impatient-mode counsel-etags markdown-mode flycheck company-ycmd ycmd magit modern-cpp-font-lock elpy))
+ '(safe-local-variable-values '((TeX-close-quote . "\"'") (TeX-open-quote . "\"`"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -39,9 +40,19 @@
                                ;; restore after startup
                                (setq gc-cons-threshold 800000)))
 
-;; MELPA archive
-(add-to-list 'package-archives
-	     '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+;; MELPA
+(require 'package)
+(setq package-archives
+      '(("gnu"             . "https://elpa.gnu.org/packages/")
+        ("melpa-stable"    . "https://stable.melpa.org/packages/")
+        ("melpa"           . "https://melpa.org/packages/"))
+      package-archive-priorities
+      '(("gnu"             . 10)
+        ("melpa-stable"    . 5)
+        ("melpa"           . 0)))
+
+;;(add-to-list 'package-archives
+;;             '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 
 ;; Perl Development Environment
 (add-to-list 'load-path "~/.emacs.d/pde/lisp")
@@ -51,8 +62,12 @@
 (eval-when-compile
   (require 'use-package))
 
+;; Ivy
+(use-package ivy
+  :config
+  (ivy-mode 1))
 
-;; Elpy and Magit
+;; Elpy
 (use-package elpy
   :ensure t
   :init
@@ -60,17 +75,34 @@
   :config
   (setq elpy-rpc-python-command "python3"))
 
+;; Markdown
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
+
+;; Für Markdown: M-x package-install RET impatient-mode RET
+;; Starte webserver: M-x httpd-start
+;; In Buffer mit Markdown: M-x impatient-mode
+;; In Browser: localhost:8080/imp
+;; In Buffer: M-x imp-set-user-filter RET markdown-html RET
+(defun markdown-html (buffer)
+  "Convert markdown to html.
+Use BUFFER"
+  (princ (with-current-buffer buffer
+           (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://strapdownjs.com/v/0.2/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
+         (current-buffer)))
+
 ;;
 ;; C++
 ;;
 (require 'modern-cpp-font-lock)
 (modern-c++-font-lock-global-mode t)
 ;;(require 'clang-format)
-;;(global-set-key (kbd "C-c C-f") 'clang-format-region)
-(use-package swiper)
-(use-package ivy
-  :config
-  (ivy-mode 1))
+(global-set-key (kbd "C-c C-f") 'clang-format-region)
 ;; counsel-etags
 (use-package counsel-etags)
 
@@ -120,7 +152,8 @@
 ;; Code-comprehensive server
 (use-package ycmd
   :commands ycmd-mode
-  :init (add-hook 'c++-mode-hook #'ycmd-mode)
+;;  ;;:init (add-hook 'c++-mode-hook #'ycmd-mode)
+  :init (add-hook 'after-init-hook #'global-ycmd-mode)
   :config
   (set-variable 'ycmd-server-command '("python3" "/home/gerry/ycmd/ycmd/"))
   (set-variable 'ycmd-global-config (expand-file-name "~/.ycm_extra_conf.py"))
@@ -145,5 +178,6 @@
 (use-package company-auctex
   :after (auctex company)
   :config (company-auctex-init))
+
 
 ;;; .emacs ends here
