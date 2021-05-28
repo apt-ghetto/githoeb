@@ -22,6 +22,7 @@
  '(custom-enabled-themes '(manoj-dark))
  '(doc-view-continuous nil)
  '(erc-nick "apt-ghetto")
+ '(erc-server "irc.libera.chat")
  '(global-linum-mode t)
  '(package-selected-packages
    '(company-auctex flycheck-ycmd impatient-mode counsel-etags markdown-mode flycheck company-ycmd ycmd magit modern-cpp-font-lock elpy))
