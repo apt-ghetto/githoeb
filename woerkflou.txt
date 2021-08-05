@@ -20,6 +20,8 @@ sbuild-update -udc eoan-amd64
 
 sbuild -d eoan-amd64
 
+sbuild --extra-repository "deb http://ppa.launchpad.net/apt-ghetto/ppa-test-lubuntu/ubuntu impish main" --extra-repository-key=../ppa.asc
+
 
 #################################################################
 
