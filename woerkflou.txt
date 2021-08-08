@@ -26,6 +26,6 @@ sbuild --extra-repository "deb http://ppa.launchpad.net/apt-ghetto/ppa-test-lubu
 #################################################################
 
 git add .
-arc diff
+arc diff HEAD~1 # HEAD~2
 
 arc patch D99 --nobranch
