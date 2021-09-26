@@ -19,14 +19,14 @@ set $term alacritty
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
 #set $menu dmenu_path | dmenu | xargs swaymsg exec --
-set $menu bemenu-run -m -1 -i | xargs swaymsg exec --
+#set $menu bemenu-run -m -1 -i | xargs swaymsg exec --
+set $menu "/home/gerry/.local/bin/rofi -show combi"
 
-set $lock swaylock -f -c 3d3d3d -s fill -i /home/gerry/Bilder/gentoo.png
-
+# set $lock swaylock -f -c 3d3d3d -s fill -i /home/gerry/Bilder/gentoo.png
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-#output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+# output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 #
 # Example configuration:
 #
@@ -40,7 +40,8 @@ set $lock swaylock -f -c 3d3d3d -s fill -i /home/gerry/Bilder/gentoo.png
 #
 # exec swayidle -w \
 #          timeout 300 'swaylock -f -c 000000' \
-#          timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+#          timeout 600 'swaymsg "output * dpms off"' \
+#               resume 'swaymsg "output * dpms on"' \
 #          before-sleep 'swaylock -f -c 000000'
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
@@ -236,8 +237,8 @@ bar {
 
     # When the status_command prints a new line to stdout, swaybar updates.
     # The default just shows the current date and time.
-    #status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
-    #status_command i3status
+    # status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
+    # status_command i3status
     swaybar_command waybar
 }
 
