@@ -25,7 +25,7 @@
  '(erc-server "irc.libera.chat")
  '(global-linum-mode t)
  '(package-selected-packages
-   '(edit-server auctex ycm company-auctex flycheck-ycmd impatient-mode counsel-etags markdown-mode flycheck company-ycmd ycmd magit modern-cpp-font-lock elpy use-package))
+   '(lsp-ui lsp-mode company-ctags edit-server auctex company-auctex impatient-mode counsel-etags markdown-mode flycheck magit modern-cpp-font-lock elpy use-package))
  '(safe-local-variable-values '((TeX-close-quote . "\"'") (TeX-open-quote . "\"`"))))
 
 (custom-set-faces
@@ -52,12 +52,18 @@
         ("melpa-stable"    . 5)
         ("melpa"           . 0)))
 
-;;(add-to-list 'package-archives
-;;             '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 
-;; Perl Development Environment
-(add-to-list 'load-path "~/.emacs.d/pde/lisp")
-(load "pde-load")
+;; Setze die Schriftart
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-12"))
+(set-face-attribute 'default t :font "DejaVu Sans Mono-12")
+
+
+;; Für Perl anstelle von PDE (Perl Development Environment), falls Perl Mode nicht richtig funktioniert/zum Testen
+(mapc
+ (lambda (pair)
+   (if (eq (cdr pair) 'perl-mode)
+       (setcdr pair 'cperl-mode)))
+ (append auto-mode-alist interpreter-mode-alist))
 
 ;; Use-package
 (eval-when-compile
@@ -100,80 +106,170 @@ Use BUFFER"
 ;;
 ;; C++
 ;;
-(require 'modern-cpp-font-lock)
-(modern-c++-font-lock-global-mode t)
-;;(require 'clang-format)
-(global-set-key (kbd "C-c C-f") 'clang-format-region)
-;; counsel-etags
-(use-package counsel-etags)
+
+;; lsp (language server protocol mode)
+;; A code completion, syntax checker, etc. engine that uses the LSP to talk to completion servers.
+(use-package lsp-mode
+  :ensure t
+  :hook (;; Python on Linux is pyls (python language server)
+	 (python-mode . lsp)
+	 ;; Bash uses bash-language-server
+	 (shell-mode . lsp)
+	 )
+  :init
+  ;; Disable yasnippet. We re-enable when yasnippet is loaded
+  (defvar lsp-enable-snippet nil)
+  (use-package lsp-ui
+    :ensure t
+    :after lsp-mode
+    :hook (lsp-mode . lsp-ui-mode)
+    :config
+    ;; Use find references and definitions key bindings instead of CTags.
+    (defun set-local-keybinds-lsp-ui ()
+      "Sets keybindings for lsp mode"
+      (interactive)
+      (local-set-key (kbd "M-.") 'lsp-ui-peek-find-definitions)
+      (local-set-key (kbd "M-?") 'lsp-ui-peek-find-references)
+      )
+    (add-hook 'c-mode-common-hook 'set-local-keybinds-lsp-ui)
+    (add-hook 'python-mode-hook 'set-local-keybinds-lsp-ui)
+    (add-hook 'shell-mode-hook ' 'set-local-keybinds-lsp-ui)
+    )
+
+  (add-hook 'c-mode-common-hook #'lsp)
+  (add-hook 'lsp-mode-hook
+	    #'(lambda ()
+	       (local-set-key (kbd "M-.") 'lsp-find-definition)))
+
+  :config
+  ;; Set GC threshold to 25MB since LSP is very memory hungry and produces a lot of garbage
+  (setq gc-cons-threshold 25000000)
+
+  ;; Increase the amount of data which Emacs reads from the process. The emacs
+  ;; default is too low 4k considering that some of the language server
+  ;; responses are in 800k - 3M ragne. Set to 1MB
+  (setq read-process-output-max (* 1024 1024))
+
+  ;; Extra flags passed to clangd.
+  (defvar lsp-clients-clangd-args '("--clang-tidy"
+				    "--fallback-style=google"
+				    "-j=4"
+				    "--enable-config"
+				    "--suggest-missing-includes"
+				    "--pch-storage=memory"))
+  (setq lsp-enable-on-type-formatting nil)
+  ;; (setq lsp-before-save-edits nil)
+  ;; Use flycheck instead of flymake
+  (setq lsp-prefer-flymake nil))
 
 ;; Snippets
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
-  :init (yas-global-mode t))
+  :init
+  (eval-when-compile
+    ;; Silence missing function warnings
+    (declare-function yas-global-mode "yasnippet.el"))
+  :config
+  (yas-reload-all)
+  (add-hook 'prog-mode-hook #'yas-minor-mode)
+  ;; Add snippet support to lsp mode
+  (setq lsp-enable-snippet t)
+  )
+(use-package yasnippet-snippets
+  :ensure t
+  :after yasnippet
+  :config
+  (yas-reload-all))
+;; Apparently the company-yasnippet backend shadows all backends that
+;; come after it. To work around this we assign yasnippet to a different
+;; keybind since actual source completion is vital.
+;;
+;; The above seems to not be an issue with LSP, but it is still nice to be
+;; able to only call up the snippets.
+(use-package company-yasnippet
+  :bind ("C-M-y" . company-yasnippet)
+  :after (yasnippet company)
+  )
+
+;; Autocomplete
+(use-package company
+  :ensure t
+  :diminish company-mode
+  :hook (prog-mode . global-company-mode)
+  :commands (company-mode company-indent-or-complete-common)
+  :init
+  (setq company-minimum-prefix-length 2
+	company-tooltip-limit 14
+	company-tooltip-align-annotations t
+	company-require-match 'never
+	company-global-modes '(not erc-mode message-mode help-mode)
+
+	;; These auto-complete the current selection when
+	;; `company-auto-complete-chars' is typed. This is too magical. We
+	;; already have the much more explicit RET and TAB.
+	company-auto-complete  nil
+	company-auto-complete-chars nil
+
+	;; Only search the current buffer for `company-dabbrev' (a backend that
+	;; suggests text your open buffers). This prevents Company from causing
+	;; lag once you have a lot of buffers open.
+	company-dabbrev-other-buffers nil
+
+	;; Make `company-dabbrev' fully case-sensitive, to improve UX with
+	;; domain-specific words with particular casing.
+	company-dabbrev-ignore-case nil
+	company-dabbrev-downcase nil)
+  :config
+  (setq company-idle-delay 0)
+  ;; remove backends for packages that are dead
+  (setq company-backends (delete 'company-eclim company-backends))
+  (setq company-backends (delete 'company-clang company-backends))
+  (setq company-backends (delete 'company-xcode company-backends))
+  )
+
+(use-package modern-cpp-font-lock
+  :ensure t
+  :diminish modern-c++-font-lock-mode
+  :hook (c++-mode . modern-c++-font-lock-mode)
+  :init
+  (eval-when-compile
+    ;; Silence missing function warnings
+    (declare-function modern-c++-font-lock-global-mode
+		      "modern-cpp-font-lock.el"))
+  :config
+  (modner-c++font-lock-global-mode t)
+  )
+;;(require 'clang-format)
+(global-set-key (kbd "C-c C-f") 'clang-format-region)
+;; counsel-etags
+(use-package counsel-etags
+  :ensure t)
 
 ;; On-the-fly syntax checking
 (use-package flycheck
   :ensure t
   :diminish flycheck-mode
-  :init (global-flycheck-mode t)
+  :hook (prog-mode . flycheck-mode)
+  :init
+  (eval-when-compile
+    ;; Silence missing function warnings
+    (declare-function global-flycheck-mode "flycheck.el"))
   :config
+  ;; Turn flycheck on everywhere
+  (global-flycheck-mode t)
   (setq flycheck-check-syntax-automatically '(save mode-enabled)))
 
-;; Autocomplete
-(use-package company
-  :commands (global-company-mode company-mode)
-  :diminish company-mode
-  :bind (:map company-active-map
-              ("M-j" . company-select-next)
-              ("M-k" . company-select-previous))
-  :custom
-  ;; no delay no autocomplete
-  (company-idle-delay 0)
-  (company-minimum-prefix-length 2)
-  (company-tooltip-limit 20)
-  
-  :preface
-  ;; enable yasnippet everywhere
-  (defvar company-mode/enable-yas t
-    "Enable yasnippet for all backends.")
-  (defun company-mode/backend-with-yas (backend)
-    (if (or
-         (not company-mode/enable-yas)
-         (and (listp backend) (member 'company-yasnippet backend)))
-        backend
-      (append (if (consp backend) backend (list backend))
-              '(:with company-yasnippet))))
+;; Load asm-mode when opening assembly files
+(use-package asm-mode
+  :mode ("\\.s\\'"))
 
-  :init (global-company-mode t)
-  :config
-)
 
-;; Code-comprehensive server
-(use-package ycmd
-  :commands ycmd-mode
-  ;;:init (add-hook 'c++-mode-hook #'ycmd-mode)
-  :init (add-hook 'after-init-hook #'global-ycmd-mode)
-  :config
-  (set-variable 'ycmd-server-command '("python3" "/home/gerry/ycmd/ycmd/"))
-  (set-variable 'ycmd-global-config (expand-file-name "~/.ycm_extra_conf.py"))
-  (set-variable 'ycmd-extra-conf-whitelist '("~/.ycm_extra_conf.py")))
-
-(use-package flycheck-ycmd
-  :after (ycmd flycheck)
-  :commands (flycheck-ycmd-setup)
-  :init (add-hook 'ycmd-mode-hook 'flycheck-ycmd-setup))
-
-(use-package company-ycmd
-  :after(ycmd company)
-  :commands (company-ycmd-setup)
-  :config (add-to-list 'company-backends (company-mode/backend-with-yas 'company-ycmd)))
 
 ;; Show argument list in echo area
 (use-package eldoc
-  :diminish eldoc-mode
-  :init (add-hook 'ycmd-mode-hook 'ycmd-eldoc-setup))
+  :diminish eldoc-mode)
+;;  :init (add-hook 'ycmd-mode-hook 'ycmd-eldoc-setup))
 
 ;; Company mode auto-completion for AUCTeX
 (use-package company-auctex
