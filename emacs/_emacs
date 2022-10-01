@@ -4,7 +4,7 @@
 
 ;;; Commentary:
 
-;; Emacs configuration of apt-ghetto
+;; Emacs configuration of apt-ghetto, inspired by Nils Deppe https://github.com/nilsdeppe/MyEnvironment/blob/master/.emacs.el
 
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
@@ -25,7 +25,7 @@
  '(erc-server "irc.libera.chat")
  '(global-linum-mode t)
  '(package-selected-packages
-   '(lsp-ui lsp-mode company-ctags edit-server auctex company-auctex impatient-mode counsel-etags markdown-mode flycheck magit modern-cpp-font-lock elpy use-package))
+   '(yasnippet-snippets lsp-treemacs lsp-ivy lsp-ui lsp-mode company-ctags edit-server auctex company-auctex impatient-mode counsel-etags markdown-mode flycheck magit modern-cpp-font-lock elpy use-package))
  '(safe-local-variable-values '((TeX-close-quote . "\"'") (TeX-open-quote . "\"`"))))
 
 (custom-set-faces
@@ -58,12 +58,13 @@
 (set-face-attribute 'default t :font "DejaVu Sans Mono-12")
 
 
-;; Für Perl anstelle von PDE (Perl Development Environment), falls Perl Mode nicht richtig funktioniert/zum Testen
+;; Für Perl anstelle von PDE (Perl Development Environment), lädt den cperl-mode anstelle von perl-mode
 (mapc
  (lambda (pair)
    (if (eq (cdr pair) 'perl-mode)
        (setcdr pair 'cperl-mode)))
  (append auto-mode-alist interpreter-mode-alist))
+
 
 ;; Use-package
 (eval-when-compile
@@ -71,6 +72,7 @@
 
 ;; Ivy
 (use-package ivy
+  :ensure t
   :config
   (ivy-mode 1))
 
@@ -104,18 +106,19 @@ Use BUFFER"
                    (buffer-substring-no-properties (point-min) (point-max))))
          (current-buffer)))
 
-;;
-;; C++
-;;
-
 ;; lsp (language server protocol mode)
 ;; A code completion, syntax checker, etc. engine that uses the LSP to talk to completion servers.
+;; Für C++ muss clangd installiert sein
+;; Für Perl muss Perl-LanguageServer installiert sein
 (use-package lsp-mode
   :ensure t
   :hook (;; Python on Linux is pyls (python language server)
 	 (python-mode . lsp)
 	 ;; Bash uses bash-language-server
 	 (shell-mode . lsp)
+	 ;; Perl mit Perl-LanguageServer (Gentoo)
+	 (perl-mode . lsp)
+	 (cperl-mode . lsp)
 	 )
   :init
   ;; Disable yasnippet. We re-enable when yasnippet is loaded
@@ -134,7 +137,9 @@ Use BUFFER"
       )
     (add-hook 'c-mode-common-hook 'set-local-keybinds-lsp-ui)
     (add-hook 'python-mode-hook 'set-local-keybinds-lsp-ui)
-    (add-hook 'shell-mode-hook ' 'set-local-keybinds-lsp-ui)
+    (add-hook 'shell-mode-hook 'set-local-keybinds-lsp-ui)
+    (add-hook 'perl-mode-hook 'set-local-keybinds-lsp-ui)
+    (add-hook 'cperl-mode-hook 'set-local-keybinds-lsp-ui)
     )
 
   (add-hook 'c-mode-common-hook #'lsp)
@@ -162,6 +167,13 @@ Use BUFFER"
   ;; (setq lsp-before-save-edits nil)
   ;; Use flycheck instead of flymake
   (setq lsp-prefer-flymake nil))
+
+(use-package lsp-ivy
+  :ensure t
+  :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs
+  :ensure t
+  :commands lsp-treemacs-error-list)
 
 ;; Snippets
 (use-package yasnippet
@@ -239,7 +251,7 @@ Use BUFFER"
     (declare-function modern-c++-font-lock-global-mode
 		      "modern-cpp-font-lock.el"))
   :config
-  (modner-c++font-lock-global-mode t)
+  (modern-c++-font-lock-global-mode t)
   )
 ;;(require 'clang-format)
 (global-set-key (kbd "C-c C-f") 'clang-format-region)
@@ -269,13 +281,16 @@ Use BUFFER"
 
 ;; Show argument list in echo area
 (use-package eldoc
+  :ensure t
   :diminish eldoc-mode)
 ;;  :init (add-hook 'ycmd-mode-hook 'ycmd-eldoc-setup))
 
 ;; Company mode auto-completion for AUCTeX
 (use-package company-auctex
+  :ensure t
   :after (auctex company)
   :config (company-auctex-init))
+
 
 ;; Edit with Emacs Firefox addon
 (use-package edit-server
