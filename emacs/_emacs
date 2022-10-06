@@ -285,6 +285,10 @@ Use BUFFER"
   :diminish eldoc-mode)
 ;;  :init (add-hook 'ycmd-mode-hook 'ycmd-eldoc-setup))
 
+;; AuCTeX
+(use-package tex
+  :ensure auctex)
+
 ;; Company mode auto-completion for AUCTeX
 (use-package company-auctex
   :ensure t
