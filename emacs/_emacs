@@ -25,7 +25,7 @@
  '(erc-server "irc.libera.chat")
  '(global-linum-mode t)
  '(package-selected-packages
-   '(yasnippet-snippets lsp-treemacs lsp-ivy lsp-ui lsp-mode company-ctags edit-server auctex company-auctex impatient-mode counsel-etags markdown-mode flycheck magit modern-cpp-font-lock elpy use-package))
+   '(nasm-mode yasnippet-snippets lsp-treemacs lsp-ivy lsp-ui lsp-mode company-ctags edit-server auctex company-auctex impatient-mode counsel-etags markdown-mode flycheck magit modern-cpp-font-lock elpy use-package))
  '(safe-local-variable-values '((TeX-close-quote . "\"'") (TeX-open-quote . "\"`"))))
 
 (custom-set-faces
@@ -287,7 +287,6 @@ Use BUFFER"
 (use-package eldoc
   :ensure t
   :diminish eldoc-mode)
-;;  :init (add-hook 'ycmd-mode-hook 'ycmd-eldoc-setup))
 
 ;; AuCTeX
 (use-package tex
@@ -318,12 +317,21 @@ Use BUFFER"
                   (menu-bar-lines . t)
                   (window-system . x))))
 
+
 ;; Kalender auf deutsch umstellen
-(setq calendar-week-start-day 1
-      calendar-day-name-array ["Sonntag" "Montag" "Dienstag" "Mittwoch" "Donnerstag" "Freitag" "Samstag"]
-      calendar-month-name-array ["Januar" "Februar" "März"
-                                 "April" "Mai" "Juni"
-                                 "Juli" "August" "September"
-                                 "Oktober" "November" "Dezember"])
+(use-package calendar
+  :config (progn
+	    (setq calendar-week-start-day 1
+		  calendar-day-name-array ["Sonntag" "Montag" "Dienstag" "Mittwoch" "Donnerstag" "Freitag" "Samstag"]
+		  calendar-month-name-array ["Januar" "Februar" "März"
+					     "April" "Mai" "Juni"
+					     "Juli" "August" "September"
+					     "Oktober" "November" "Dezember"])))
+
+;; Org-Mode
+(use-package org
+  :config (progn
+	    ;; Syntax highlighting for the language in a source block
+	    (setq org-src-fontify-natively t)))
 
 ;;; .emacs ends here
