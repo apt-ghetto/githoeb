@@ -1,0 +1,365 @@
+# -*- lexical-binding: t; -*-
+#+AUTHOR: apt-ghetto
+#+STARTUP: overview
+
+* Package Initialisierung
+  #+BEGIN_SRC emacs-lisp
+    (package-initialize)
+    (require 'package)
+    (eval-when-compile
+      (require 'use-package))
+  #+END_SRC
+* Generelle Emacs Einstellungen
+** Garbage collection für den Start
+   #+BEGIN_SRC emacs-lisp
+     (setq gc-cons-threshold 64000000)
+     (add-hook 'after-init-hook #'(lambda ()
+				    ;; restore after startup
+				    (setq gc-cons-threshold 800000)))
+   #+END_SRC
+** Paketquellen
+   #+BEGIN_SRC emacs-lisp
+     (setq package-archives
+	   '(("gnu"             . "https://elpa.gnu.org/packages/")
+	     ("melpa-stable"    . "https://stable.melpa.org/packages/")
+	     ("melpa"           . "https://melpa.org/packages/"))
+	   package-archive-priorities
+	   '(("gnu"             . 10)
+	     ("melpa-stable"    . 5)
+	     ("melpa"           . 0)))
+   #+END_SRC
+** Turn off scroll bar
+   #+BEGIN_SRC emacs-lisp
+     (scroll-bar-mode -1)
+   #+END_SRC
+** Schriftart
+   #+BEGIN_SRC emacs-lisp
+     (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-12"))
+     (set-face-attribute 'default t :font "DejaVu Sans Mono-12")
+   #+END_SRC
+** Kalendereinstellungen
+   #+BEGIN_SRC emacs-lisp
+     (use-package calendar
+       :config (progn
+		 (setq calendar-week-start-day 1
+		       calendar-day-name-array ["Sonntag" "Montag" "Dienstag" "Mittwoch"
+						"Donnerstag" "Freitag" "Samstag"]
+		       calendar-month-name-array ["Januar" "Februar" "März"
+						  "April" "Mai" "Juni"
+						  "Juli" "August" "September"
+						  "Oktober" "November" "Dezember"])))
+   #+END_SRC
+* Packages
+** Ivy
+   #+BEGIN_SRC emacs-lisp
+     (use-package ivy
+       :ensure t
+       :config
+       (ivy-mode 1))
+   #+END_SRC
+** Elpy
+   #+BEGIN_SRC emacs-lisp
+     (use-package elpy
+       :ensure t
+       :init
+       (elpy-enable)
+       :config
+       (setq elpy-rpc-python-command "python3"))
+   #+END_SRC
+** Magit
+   #+begin_src emacs-lisp
+     (use-package magit
+       :ensure t)
+   #+end_src
+
+** Perl
+   Für Perl anstelle von PDE (Perl Development Environment), lädt den cperl-mode anstelle
+   von perl-mode
+   #+begin_src emacs-lisp
+     (mapc
+      (lambda (pair)
+	(if (eq (cdr pair) 'perl-mode)
+	    (setcdr pair 'cperl-mode)))
+      (append auto-mode-alist interpreter-mode-alist))
+   #+end_src
+** Markdown
+   Benutzung:
+     - Starte Webserver: =M-x httpd-start=
+     - In Buffer mit Markdown: =M-x impatient-mode=
+     - In Browser: =localhost:8080/imp=
+     - In Buffer: =M-x imp-set-filter RET markdown-html RET=
+   #+begin_src emacs-lisp
+     (use-package markdown-mode
+       :ensure t
+       :commands (markdown-mode gfm-mode)
+       :mode (("README\\.md\\'" . gfm-mode)
+	      ("\\.md\\'" . markdown-mode)
+	      ("\\.markdown\\'" . markdown-mode))
+       :init (setq markdown-command "multimarkdown"))
+
+     (use-package impatient-mode
+       :ensure t)
+
+     (defun markdown-html (buffer)
+  "Convert markdown to html.
+Use BUFFER"
+  (princ (with-current-buffer buffer
+	   (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>"
+                   (buffer-substring-no-properties (point-min) (point-max))))
+         (current-buffer)))
+   #+end_src
+
+   
+   
+** Snippets
+   #+begin_src emacs-lisp
+     (use-package yasnippet
+       :ensure t
+       :diminish yas-minor-mode
+       :init
+       (eval-when-compile
+	 ;; Silence missing function warnings
+	 (declare-function yas-global-mode "yasnippet.el"))
+       :config
+       (yas-reload-all)
+       (add-hook 'prog-mode-hook #'yas-minor-mode)
+       ;; Add snippet support to lsp mode
+       (setq lsp-enable-snippet t)
+       )
+
+     (use-package yasnippet-snippets
+       :ensure t
+       :after yasnippet
+       :config
+       (yas-reload-all))
+   #+end_src
+** Autocomplete
+   #+begin_src emacs-lisp
+     (use-package company
+       :ensure t
+       :diminish company-mode
+       :hook (prog-mode . global-company-mode)
+       :commands (company-mode company-indent-or-complete-common)
+       :init
+       (setq company-minimum-prefix-length 2
+	     company-tooltip-limit 14
+	     company-tooltip-align-annotations t
+	     company-require-match 'never
+	     company-global-modes '(not erc-mode message-mode help-mode)
+
+	     ;; These auto-complete the current selection when
+	     ;; `company-auto-complete-chars' is typed. This is too magical. We
+	     ;; already have the much more explicit RET and TAB.
+	     company-auto-complete  nil
+	     company-auto-complete-chars nil
+
+	     ;; Only search the current buffer for `company-dabbrev' (a backend that
+	     ;; suggests text your open buffers). This prevents Company from causing
+	     ;; lag once you have a lot of buffers open.
+	     company-dabbrev-other-buffers nil
+
+	     ;; Make `company-dabbrev' fully case-sensitive, to improve UX with
+	     ;; domain-specific words with particular casing.
+	     company-dabbrev-ignore-case nil
+	     company-dabbrev-downcase nil)
+       :config
+       (setq company-idle-delay 0)
+       ;; remove backends for packages that are dead
+       (setq company-backends (delete 'company-eclim company-backends))
+       (setq company-backends (delete 'company-clang company-backends))
+       (setq company-backends (delete 'company-xcode company-backends))
+       )
+
+     ;; Apparently the company-yasnippet backend shadows all backends that
+     ;; come after it. To work around this we assign yasnippet to a different
+     ;; keybind since actual source completion is vital.
+     ;;
+     ;; The above seems to not be an issue with LSP, but it is still nice to be
+     ;; able to only call up the snippets.
+     (use-package company-yasnippet
+       :bind ("C-M-y" . company-yasnippet)
+       :after (yasnippet company)
+       )
+   #+end_src
+
+** C++
+   #+begin_src emacs-lisp
+     (use-package modern-cpp-font-lock
+       :ensure t
+       :diminish modern-c++-font-lock-mode
+       :hook (c++-mode . modern-c++-font-lock-mode)
+       :init
+       (eval-when-compile
+	 ;; Silence missing function warnings
+	 (declare-function modern-c++-font-lock-global-mode
+			   "modern-cpp-font-lock.el"))
+       :config
+       (modern-c++-font-lock-global-mode t)
+       )
+
+     (use-package clang-format
+       :ensure t)
+
+     (global-set-key (kbd "C-c C-f") 'clang-format-region)
+   #+end_src
+
+** Programmieren allgemein
+*** Ctags
+    #+begin_src emacs-lisp
+      (use-package counsel-etags
+        :ensure t)
+    #+end_src
+*** Eldoc
+    Zeigt die Argumentenliste im Echobereich
+    #+begin_src emacs-lisp
+      (use-package eldoc
+	:ensure t
+	:diminish eldoc-mode)
+    #+end_src
+** On-the-fly syntax checking with flycheck
+   #+begin_src emacs-lisp
+     (use-package flycheck
+       :ensure t
+       :diminish flycheck-mode
+       :hook (prog-mode . flycheck-mode)
+       :init
+       (eval-when-compile
+	 ;; Silence missing function warnings
+	 (declare-function global-flycheck-mode "flycheck.el"))
+       :config
+       ;; Turn flycheck on everywhere
+       (global-flycheck-mode t)
+       (setq flycheck-check-syntax-automatically '(save mode-enabled)))
+   #+end_src
+** ASM
+   Lade asm-mode, wenn Assembly Datei geöffnet wird
+   #+begin_src emacs-lisp
+     (use-package asm-mode
+       :ensure t
+       :mode ("\\.s\\'"))
+   #+end_src
+
+** LaTeX
+   AuCTeX
+   #+begin_src emacs-lisp
+     (use-package tex
+       :ensure auctex)
+   #+end_src
+*** Company AuCTeX
+    Für autocomplete
+    #+begin_src emacs-lisp
+      (use-package company-auctex
+	:ensure t
+	:after (auctex company)
+	:config (company-auctex-init))
+    #+end_src
+
+** Firefox Addon: Edit with Emacs
+   #+begin_src emacs-lisp
+     (use-package edit-server
+       :ensure t
+       :commands edit-server-start
+       :init (if after-init-time
+		 (edit-server-start)
+	       (add-hook 'after-init-hook
+			 #'(lambda() (edit-server-start))))
+       :config (setq edit-server-new-frame-alist
+		     '((name . "Edit with Emacs FRAME")
+		       (top . 200)
+		       (left . 200)
+		       (width . 80)
+		       (height . 25)
+		       (minibuffer . t)
+		       (menu-bar-lines . t)
+		       (window-system . x))))
+   #+end_src
+
+** Org Mode
+   #+begin_src emacs-lisp
+     (use-package org
+       :ensure t
+       :config (progn
+		 ;; Syntax highlighting für die Sprache im Codeblock
+		 (setq org-src-fontify-natively t)))
+   #+end_src
+
+** LSP
+   LSP (Language Server Protocol) mode
+
+   A code completion, syntax checker, etc. engine that uses the LSP to talk to
+   completion servers.
+*** Abhängigkeiten
+    | Sprache   | Abhängigkeit        | Gentoo                               |
+    |-----------+---------------------+--------------------------------------|
+    | C und C++ | clangd              | sys-devel/clang mit "extra" USE flag |
+    | Perl      | Perl-LanguageServer | dev-perl/Perl-LanguageServer         |
+    | Python    | pyls                | dev-python/python-lsp-server         |
+*** Code
+    #+begin_src emacs-lisp
+      (use-package lsp-mode
+	:ensure t
+	:hook (;; Python on Linux is pyls (python language server)
+	       (python-mode . lsp)
+	       ;; Bash uses bash-language-server
+	       (shell-mode . lsp)
+	       ;; Perl mit Perl-LanguageServer
+	       (perl-mode . lsp)
+	       (cperl-mode . lsp)
+	       )
+	:init
+	;; Disable yasnippet. Re-enable when yasnippet is loaded.
+	(defvar lsp-enable-snippet nil)
+	(use-package lsp-ui
+	  :ensure t
+	  :after lsp-mode
+	  :hook (lsp-mode . lsp-ui-mode)
+	  :config
+	  ;; Use find references and definitions key bindings instead of CTags.
+	  (defun set-local-keybinds-lsp-ui ()
+	    "Sets keybindings for lsp mode"
+	    (interactive)
+	    (local-set-key (kbd "M-.") 'lsp-ui-peek-find-definitions)
+	    (local-set-key (kbd "M-?") 'lsp-ui-peek-find-references)
+	    )
+	  (add-hook 'c-mode-common-hook 'set-local-keybinds-lsp-ui)
+	  (add-hook 'python-mode-hook 'set-local-keybinds-lsp-ui)
+	  (add-hook 'shell-mode-hook 'set-local-keybinds-lsp-ui)
+	  (add-hook 'perl-mode-hook 'set-local-keybinds-lsp-ui)
+	  (add-hook 'cperl-mode-hook 'set-local-keybinds-lsp-ui)
+	  )
+	(add-hook 'c-mode-common-hook #'lsp)
+	(add-hook 'lsp-mode-hook
+		  #'(lambda ()
+		      (local-set-key (kbd "M-.") 'lsp-find-definition)))
+	:config
+	;; Set GC threshold to 25 MB since LSP is very memory hungry
+	;; and produces a lot of garbage
+	(setq gc-cons-threshold 25000000)
+
+	;; Increase the amount of data which Emacs reads from the process.
+	;; The Emacs default is too low 4k considering that some of the language
+	;; server responses are in 800k - 3M range. Set to 1MB
+	(setq read-process-output-max (* 1024 1024))
+
+	;; Extra flags passed to clangd.
+	(defvar lsp-clients-clangd-args '("--clang-tidy"
+					  "--fallback-style=google"
+					  "-j=4"
+					  "--enable-config"
+					  "--suggest-missing-includes"
+					  "--pch-storage=memory"))
+	(setq lsp-enable-on-type-formatting nil)
+	;; (setq lsp-before-save-edits nil) ;;; Keine Ahnung, was das machen würde
+	;; Use flycheck instead of flymake
+	(setq lsp-prefer-flymake nil))
+    #+end_src
+*** Zusätzliche Pakete für LSP
+    #+begin_src emacs-lisp
+      (use-package lsp-ivy
+	:ensure t
+	:commands lsp-ivy-workspace-symbol)
+
+      (use-package lsp-treemacs
+	:ensure t
+	:commands lsp-treemacs-error-list)
+    #+end_src
