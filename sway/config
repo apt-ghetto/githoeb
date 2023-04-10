@@ -22,7 +22,15 @@ set $term alacritty
 #set $menu bemenu-run -m -1 -i | xargs swaymsg exec --
 set $menu "/home/gerry/.local/bin/rofi -show combi"
 
-# set $lock swaylock -f -c 3d3d3d -s fill -i /home/gerry/Bilder/gentoo.png
+set $lock swaylock -f -c 3d3d3d -s fill -i /home/gerry/Bilder/gentoo.png
+
+### gnome-keyring-daemon
+# Umgebungsvariablen setzen
+# Befehle von /etc/X11/xinit/xinitrc.d/50-systemd-user.sh angepasst
+exec systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK
+exec dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
+exec gnome-keyring-daemon --components="secrets,pkcs11" --start
+
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
@@ -40,8 +48,7 @@ set $menu "/home/gerry/.local/bin/rofi -show combi"
 #
 # exec swayidle -w \
 #          timeout 300 'swaylock -f -c 000000' \
-#          timeout 600 'swaymsg "output * dpms off"' \
-#               resume 'swaymsg "output * dpms on"' \
+#          timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
 #          before-sleep 'swaylock -f -c 000000'
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
@@ -65,7 +72,6 @@ output HDMI-A-1 resolution 1920x1080 position 1920,0
 # Read `man 5 sway-input` for more information about this section.
 input * {
     xkb_layout "ch"
-    xkb_model "pc105"
     xkb_numlock enabled
 }
 
@@ -96,6 +102,7 @@ input * {
     bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
 
     bindsym ctrl+alt+l exec $lock
+
 #
 # Moving around:
 #
@@ -146,7 +153,7 @@ input * {
     bindsym $mod+KP_8 workspace number 8
     bindsym $mod+KP_9 workspace number 9
     bindsym $mod+KP_0 workspace number 10
-    # Fokusiertes Fenster mit Nummernblock zu workspace verschieben
+    # Fokussiertes Fenster mit Nummernblock zu workspace verschieben
     bindsym $mod+Shift+KP_End    move container to workspace number 1
     bindsym $mod+Shift+KP_Down   move container to workspace number 2
     bindsym $mod+Shift+KP_Next   move container to workspace number 3
@@ -216,16 +223,16 @@ mode "resize" {
     # right will grow the containers width
     # up will shrink the containers height
     # down will grow the containers height
-    bindsym $left resize shrink width 10px
-    bindsym $down resize grow height 10px
-    bindsym $up resize shrink height 10px
-    bindsym $right resize grow width 10px
+    bindsym $left resize shrink width 10px or 10 ppt
+    bindsym $down resize grow height 10px or 10 ppt
+    bindsym $up resize shrink height 10px or 10 ppt
+    bindsym $right resize grow width 10px or 10 ppt
 
     # Ditto, with arrow keys
-    bindsym Left resize shrink width 10px
-    bindsym Down resize grow height 10px
-    bindsym Up resize shrink height 10px
-    bindsym Right resize grow width 10px
+    bindsym Left resize shrink width 10px or 10 ppt
+    bindsym Down resize grow height 10px or 10 ppt
+    bindsym Up resize shrink height 10px or 10 ppt
+    bindsym Right resize grow width 10px or 10 ppt
 
     # Return to default mode
     bindsym Return mode "default"
@@ -234,6 +241,11 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 
 ###### Eigene Konfiguration
+
+## Für flameshot
+# Funktioniert momentan scheinbar nicht
+for_window [app_id="flameshot"] border pixel 0, floating enable, fullscreen disable, move absolute position 0 0
+
 set $bg #2c2c2c
 set $fg #9f9f9f
 set $hi #efef8f
