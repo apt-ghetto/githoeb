@@ -11,5 +11,9 @@ ExecStop=/usr/bin/emacsclient --eval "(kill-emacs)"
 Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
 Restart=on-failure
 
+# Emacs will exit with status 15 after having received SIGTERM, which
+# is the default "KillSignal" value systemd uses to stop services.
+SuccessExitStatus=15
+
 [Install]
 WantedBy=default.target
