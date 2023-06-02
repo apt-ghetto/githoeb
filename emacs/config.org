@@ -28,9 +28,11 @@
 	     ("melpa-stable"    . 5)
 	     ("melpa"           . 0)))
    #+END_SRC
-** Turn off scroll bar
+** Turn off some bars
    #+BEGIN_SRC emacs-lisp
      (scroll-bar-mode -1)
+     (menu-bar-mode -1)
+     (tool-bar-mode -1)
    #+END_SRC
 ** Schriftart
    #+BEGIN_SRC emacs-lisp
@@ -145,7 +147,7 @@ Use BUFFER"
 	     company-tooltip-limit 14
 	     company-tooltip-align-annotations t
 	     company-require-match 'never
-	     company-global-modes '(not erc-mode message-mode help-mode)
+	     company-global-modes '(not message-mode help-mode) ;; erc-mode war mal dabei
 
 	     ;; These auto-complete the current selection when
 	     ;; `company-auto-complete-chars' is typed. This is too magical. We
@@ -289,11 +291,11 @@ Use BUFFER"
    A code completion, syntax checker, etc. engine that uses the LSP to talk to
    completion servers.
 *** Abhängigkeiten
-    | Sprache   | Abhängigkeit        | Gentoo                               |
-    |-----------+---------------------+--------------------------------------|
-    | C und C++ | clangd              | sys-devel/clang mit "extra" USE flag |
-    | Perl      | Perl-LanguageServer | dev-perl/Perl-LanguageServer         |
-    | Python    | pyls                | dev-python/python-lsp-server         |
+    | Sprache   | Abhängigkeit        | Gentoo                               | Kali                        |
+    |-----------+---------------------+--------------------------------------+-----------------------------|
+    | C und C++ | clangd              | sys-devel/clang mit "extra" USE flag | clangd                      |
+    | Perl      | Perl-LanguageServer | dev-perl/Perl-LanguageServer         | libperl-languageserver-perl |
+    | Python    | pyls                | dev-python/python-lsp-server         | python3-pylsp               |
 *** Code
     #+begin_src emacs-lisp
       (use-package lsp-mode
