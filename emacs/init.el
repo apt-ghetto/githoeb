@@ -1,4 +1,4 @@
-;;; init.el --- Summary  -*- coding: utf-8; lexical-binding: t; -*-
+;;; .init.el --- Summary  -*- coding: utf-8; lexical-binding: t; -*-
 
 ;;; Commentary:
 
@@ -21,9 +21,9 @@
  '(doc-view-continuous nil)
  '(erc-nick "apt-ghetto")
  '(erc-server "irc.libera.chat")
- '(global-linum-mode t)
+ '(global-display-line-numbers-mode 1)
  '(package-selected-packages
-   '(nasm-mode yasnippet-snippets lsp-treemacs lsp-ivy lsp-ui lsp-mode company-ctags edit-server auctex company-auctex impatient-mode counsel-etags markdown-mode flycheck magit modern-cpp-font-lock elpy use-package))
+   '(clang-format nasm-mode yasnippet-snippets lsp-treemacs lsp-ivy lsp-ui lsp-mode company-ctags edit-server auctex company-auctex impatient-mode counsel-etags markdown-mode flycheck magit modern-cpp-font-lock elpy use-package))
  '(safe-local-variable-values '((TeX-close-quote . "\"'") (TeX-open-quote . "\"`"))))
 
 (custom-set-faces
