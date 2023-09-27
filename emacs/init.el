@@ -18,7 +18,7 @@
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
  '(custom-enabled-themes '(manoj-dark))
- '(doc-view-continuous nil)
+ '(doc-view-continuous t)
  '(erc-nick "apt-ghetto")
  '(erc-server "irc.libera.chat")
  '(global-display-line-numbers-mode 1)
