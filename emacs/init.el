@@ -19,6 +19,7 @@
  '(column-number-mode t)
  '(custom-enabled-themes '(manoj-dark))
  '(doc-view-continuous t)
+ '(erc-join-buffer 'window-noselect)
  '(erc-nick "apt-ghetto")
  '(erc-server "irc.libera.chat")
  '(global-display-line-numbers-mode 1)
