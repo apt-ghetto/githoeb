@@ -1,0 +1,8 @@
+#+TODO: TODO(t) INPROGRESS(i) NEXT(n) WAITING(w) SOMEDAY(s) DELEGATED(g) PROJ(p) | DONE(d) FORWARDED(w) CANCELLED(c)
+#+TAGS: PHONE(o) URGENT(u) MAIL(m)
+#+STARTUP: overview
+
+* Templateprojekt
+:PROPERTIES:
+:ARCHIVE: %s_archive::
+:END:
