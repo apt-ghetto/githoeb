@@ -55,8 +55,12 @@ exec export $(gnome-keyring-daemon)
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 300 seconds, and turn your screens back on when
 # resumed. It will also lock your screen before your computer goes to sleep.
-output DP-3     resolution 1920x1080 position 0,0
-output HDMI-A-1 resolution 1920x1080 position 1920,0
+output DP-3     resolution 1920x1080 position 0 0
+output DP-2	resolution 1920x1080 position 1920 0
+#output HDMI-A-1 resolution 1920x1080 position 1920 0
+focus output DP-3
+workspace 1 output DP-3
+
 
 ### Input configuration
 #
