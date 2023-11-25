@@ -910,39 +910,29 @@
   # Highlight window damage information.
   #highlight_damage: false
 
-# Original:
-# Nightfox Alacritty Colors
-# Style: carbonfox
-# Upstream: https://github.com/edeneast/nightfox.nvim/raw/main/extra/carbonfox/nightfox_alacritty.yml
-# Modifiziert von apt-ghetto
 colors:
   # Default colors
   primary:
-    background: '0x2c2c2c'
+    background: '0x202020'
     foreground: '0xf2f4f8'
   cursor:
     text:    '0xd9027d'
     cursor:  '0xff69b4'
-  # Normal colors
   normal:
-    black:   '0x282828'
+    black:   '0x000000'
     red:     '0xff0000'
-    green:   '0x25be6a'
-    yellow:  '0x08bdba'
-    blue:    '0x78a9ff'
-    magenta: '0xbe95ff'
-    cyan:    '0x33b1ff'
-    white:   '0xdfdfe0'
-  # Bright colors
+    green:   '0x00cd00'
+    yellow:  '0xf5f500'
+    blue:    '0x00a9ff'
+    magenta: '0xcd00cd'
+    cyan:    '0x00cdcd'
+    white:   '0xe5e5e5'
   bright:
-    black:   '0x484848'
+    black:   '0x7f7f7f'
     red:     '0xff3333'
-    green:   '0x46c880'
-    yellow:  '0x2dc7c4'
-    blue:    '0x8cb6ff'
-    magenta: '0xc8a5ff'
-    cyan:    '0x52bdff'
-    white:   '0xe4e4e5'
-  indexed_colors:
-    - { index: 16, color: '0x3ddbd9' }
-    - { index: 17, color: '0xff7eb6' }
+    green:   '0x00ff00'
+    yellow:  '0xffff00'
+    blue:    '0x5c5cff'
+    magenta: '0xff00ff'
+    cyan:    '0x00ffff'
+    white:   '0xffffff'
