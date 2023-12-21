@@ -1,8 +1,83 @@
-#+TODO: TODO(t) INPROGRESS(i) NEXT(n) WAITING(w) SOMEDAY(s) DELEGATED(g) PROJ(p) | DONE(d) FORWARDED(w) CANCELLED(c)
-#+TAGS: PHONE(o) URGENT(u) MAIL(m)
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) DELEGATED(g) PROJ(p) INPROGRESS(i) | DONE(d) CANCELLED(c)
+#+TAGS: URGENT(u) MAIL(m) PHONE(o)
 #+STARTUP: overview
 
-* Templateprojekt
 :PROPERTIES:
 :ARCHIVE: %s_archive::
 :END:
+
+* PROJ Wichtiges Projekt mit Zeitmanagement
+  :PROPERTIES:
+  :ID:      projektwichtig
+  :COLUMNS: %50ITEM %Effort(Schätzung){:} %CLOCKSUM(Aufgewendet) %6TODO(Status)
+  :END:
+** DONE Gitlab aufsetzen
+   :PROPERTIES:
+   :Effort: 3:00
+   :END:
+   :LOGBOOK:
+   CLOCK: [2023-02-24 Fri 07:00]--[2023-02-24 Fri 10:00] =>  3:00
+   :END:
+   - Repository einrichten
+   - CI zum Laufen bringen
+   - TeX Dokument erstellen und kompilierfähig machen
+   - LaTeX installieren auf verschiedenen PCs
+** DONE Projektbeschrieb schreiben
+   :PROPERTIES:
+   :Effort: 6:00
+   :END:
+   :LOGBOOK:
+   CLOCK: [2023-02-24 Fri 10:00]--[2023-02-24 Fri 12:00] =>  2:00
+   CLOCK: [2023-02-24 Fri 13:00]--[2023-02-24 Fri 17:00] =>  4:00
+   :END:
+** TODO Projektplan erstellen
+*** TODO Meilensteine
+     :PROPERTIES:
+     :Effort: 2:00
+     :END:
+     :LOGBOOK:
+     CLOCK: [2023-02-27 Mo 18:03]--[2023-02-27 Mo 19:03] =>  1:00
+     :END:
+*** TODO Aufwandsschätzungen
+     :PROPERTIES:
+     :Effort: 1:00
+     :END:
+*** TODO Vorgesehene Lieferobjekte
+    - Projektbericht
+** TODO Literatur
+*** TODO Zu Thema einlesen
+    :PROPERTIES:
+    :Effort: 20:00
+    :END:
+*** TODO Empfehlungen zusammensuchen
+    :PROPERTIES:
+    :Effort: 8:00
+    :END:
+** TODO Testserver aufsetzen
+*** TODO Server aufsetzen und konfigurieren
+    :PROPERTIES:
+    :Effort: 8:00
+    :END:
+** TODO Schlüsselverwaltung
+*** TODO Ansible einlesen
+    :PROPERTIES:
+    :Effort: 24:00
+    :END:
+*** TODO Konzept erarbeiten
+    :PROPERTIES:
+    :Effort: 16:00
+    :END:
+*** TODO Konzept implementieren
+    :PROPERTIES:
+    :Effort: 24:00
+    :END:
+** TODO Projekt dokumentieren
+   :PROPERTIES:
+   :Effort: 66:00
+   :END:
+** TODO Projekt abgeben
+   :PROPERTIES:
+   :Effort: 1:00
+   :END:
+    
+
