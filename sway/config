@@ -42,6 +42,11 @@ exec export $(gnome-keyring-daemon)
 #   output HDMI-A-1 resolution 1920x1080 position 1920,0
 #
 # You can get the names of your outputs by running: swaymsg -t get_outputs
+output DP-3     resolution 1920x1080 position 0 0
+output DP-2	resolution 1920x1080 position 1920 0
+#output HDMI-A-1 resolution 1920x1080 position 1920 0
+focus output DP-3
+workspace 1 output DP-3
 
 ### Idle configuration
 #
@@ -55,12 +60,11 @@ exec export $(gnome-keyring-daemon)
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 300 seconds, and turn your screens back on when
 # resumed. It will also lock your screen before your computer goes to sleep.
-output DP-3     resolution 1920x1080 position 0 0
-output DP-2	resolution 1920x1080 position 1920 0
-#output HDMI-A-1 resolution 1920x1080 position 1920 0
-focus output DP-3
-workspace 1 output DP-3
-
+exec swayidle -w \
+     timeout 9999 'swaylock -f -c 000000' \
+     timeout   20 'if pgrep swaylock; then swaymsg "output * dpms off"; fi' \
+           resume 'swaymsg "output * dpms on"' \
+     before-sleep 'swaylock -f -c 000000'
 
 ### Input configuration
 #
