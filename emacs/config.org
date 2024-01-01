@@ -9,6 +9,11 @@
     (eval-when-compile
       (require 'use-package))
   #+END_SRC
+** Eigene Einstellungen
+#+BEGIN_SRC emacs-lisp
+  (setq custom-file "~/.emacs.d/eigene-vars.el")
+  (load custom-file)
+#+END_SRC
 * Generelle Emacs Einstellungen
 ** Garbage collection für den Start
    #+BEGIN_SRC emacs-lisp
@@ -51,6 +56,25 @@
 						  "Juli" "August" "September"
 						  "Oktober" "November" "Dezember"])))
    #+END_SRC
+** Dunkles Theme laden
+#+begin_src emacs-lisp
+  (load-theme 'modus-vivendi)
+#+end_src
+** Zeilennummern
+*** Zeilennummern in der Mode line
+#+begin_src emacs-lisp
+  (column-number-mode 1)
+#+end_src
+*** Zeilennummern für die Buffer
+#+begin_src emacs-lisp
+  (global-display-line-numbers-mode 1)
+#+end_src
+** Installiere diminish
+Das Package =use-package= benötigt diminish, damit =:diminish= funktioniert.
+#+begin_src emacs-lisp
+  (use-package diminish
+    :ensure t)
+#+end_src
 * Packages
 ** Ivy
    #+BEGIN_SRC emacs-lisp
@@ -111,8 +135,6 @@ Use BUFFER"
          (current-buffer)))
    #+end_src
 
-   
-   
 ** Snippets
    #+begin_src emacs-lisp
      (use-package yasnippet
@@ -204,7 +226,6 @@ Use BUFFER"
 
      (global-set-key (kbd "C-c C-f") 'clang-format-region)
    #+end_src
-
 ** Programmieren allgemein
 *** Ctags
     #+begin_src emacs-lisp
@@ -225,12 +246,12 @@ Use BUFFER"
        :diminish flycheck-mode
        :hook (prog-mode . flycheck-mode)
        :init
-       (eval-when-compile
-	 ;; Silence missing function warnings
-	 (declare-function global-flycheck-mode "flycheck.el"))
-       :config
-       ;; Turn flycheck on everywhere
+       ;; Aktiviere Flycheck überall ausser in Org Mode
+       ;; Org Mode und Flycheck nutzen beide "C-c !", ich möchte das von Org Mode nutzen
+       ;; org-time-stamp-inactive
        (global-flycheck-mode t)
+       (setq flycheck-global-modes '(not org-mode))
+       :config
        (setq flycheck-check-syntax-automatically '(save mode-enabled)))
    #+end_src
 ** ASM
@@ -240,7 +261,6 @@ Use BUFFER"
        :ensure t
        :mode ("\\.s\\'"))
    #+end_src
-
 ** LaTeX
    AuCTeX
    #+begin_src emacs-lisp
@@ -255,7 +275,6 @@ Use BUFFER"
 	:after (auctex company)
 	:config (company-auctex-init))
     #+end_src
-
 ** Firefox Addon: Edit with Emacs
    #+begin_src emacs-lisp
      (use-package edit-server
@@ -273,9 +292,8 @@ Use BUFFER"
 		       (height . 25)
 		       (minibuffer . t)
 		       (menu-bar-lines . t)
-		       (window-system . x))))
+		       (window-system . pgtk))))
    #+end_src
-
 ** Org Mode
    #+begin_src emacs-lisp
      (use-package org
@@ -284,7 +302,24 @@ Use BUFFER"
 		 ;; Syntax highlighting für die Sprache im Codeblock
 		 (setq org-src-fontify-natively t)))
    #+end_src
-
+** Rustic
+   Rust Mode
+   https://robert.kra.hn/posts/rust-emacs-setup/
+   #+begin_src emacs-lisp
+     (use-package rustic
+       :ensure t
+       :bind (:map rustic-mode-map
+		   ("M-j" . lsp-ui-imenu)
+		   ("M-?" . lsp-find-references)
+		   ("C-c C-c l" . flycheck-list-errors)
+		   ("C-c C-c a" . lsp-execute-code-action)
+		   ("C-c C-c r" . lsp-rename)
+		   ("C-c C-c q" . lsp-workspace-restart)
+		   ("C-c C-c Q" . lsp-workspace-shutdown)
+		   ("C-c C-c s" . lsp-rust-analyzer-status))
+       :config
+       (setq rustic-format-on-save t))
+   #+end_src
 ** LSP
    LSP (Language Server Protocol) mode
 
@@ -307,6 +342,8 @@ Use BUFFER"
 	       ;; Perl mit Perl-LanguageServer
 	       (perl-mode . lsp)
 	       (cperl-mode . lsp)
+	       ;; Rust
+	       (rustic . lsp)
 	       )
 	:init
 	;; Disable yasnippet. Re-enable when yasnippet is loaded.
@@ -353,7 +390,8 @@ Use BUFFER"
 	(setq lsp-enable-on-type-formatting nil)
 	;; (setq lsp-before-save-edits nil) ;;; Keine Ahnung, was das machen würde
 	;; Use flycheck instead of flymake
-	(setq lsp-prefer-flymake nil))
+	(setq lsp-prefer-flymake nil)
+	)
     #+end_src
 *** Zusätzliche Pakete für LSP
     #+begin_src emacs-lisp
