@@ -8,6 +8,8 @@
     (require 'package)
     (eval-when-compile
       (require 'use-package))
+
+    (setq use-package-verbose t) ;; Zum Schauen, welche Pakete langsam laden
   #+END_SRC
 ** Eigene Einstellungen
 #+BEGIN_SRC emacs-lisp
@@ -16,46 +18,47 @@
 #+END_SRC
 * Generelle Emacs Einstellungen
 ** Garbage collection für den Start
-   #+BEGIN_SRC emacs-lisp
-     (setq gc-cons-threshold 64000000)
-     (add-hook 'after-init-hook #'(lambda ()
-				    ;; restore after startup
-				    (setq gc-cons-threshold 800000)))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq gc-cons-threshold 64000000)
+  (add-hook 'after-init-hook #'(lambda ()
+				 ;; restore after startup
+				 (setq gc-cons-threshold (* 50 1000 1000))))
+#+END_SRC
 ** Paketquellen
-   #+BEGIN_SRC emacs-lisp
-     (setq package-archives
-	   '(("gnu"             . "https://elpa.gnu.org/packages/")
-	     ("melpa-stable"    . "https://stable.melpa.org/packages/")
-	     ("melpa"           . "https://melpa.org/packages/"))
-	   package-archive-priorities
-	   '(("gnu"             . 10)
-	     ("melpa-stable"    . 5)
-	     ("melpa"           . 0)))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq package-archives
+	'(("gnu"             . "https://elpa.gnu.org/packages/")
+	  ("melpa-stable"    . "https://stable.melpa.org/packages/")
+	  ("melpa"           . "https://melpa.org/packages/"))
+	package-archive-priorities
+	'(("gnu"             . 10)
+	  ("melpa-stable"    . 5)
+	  ("melpa"           . 0)))
+#+END_SRC
 ** Turn off some bars
-   #+BEGIN_SRC emacs-lisp
-     (scroll-bar-mode -1)
-     (menu-bar-mode -1)
-     (tool-bar-mode -1)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (scroll-bar-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+#+END_SRC
 ** Schriftart
-   #+BEGIN_SRC emacs-lisp
-     (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-12"))
-     (set-face-attribute 'default t :font "DejaVu Sans Mono-12")
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-12"))
+  (set-face-attribute 'default t :font "DejaVu Sans Mono-12")
+#+END_SRC
 ** Kalendereinstellungen
-   #+BEGIN_SRC emacs-lisp
-     (use-package calendar
-       :config (progn
-		 (setq calendar-week-start-day 1
-		       calendar-day-name-array ["Sonntag" "Montag" "Dienstag" "Mittwoch"
-						"Donnerstag" "Freitag" "Samstag"]
-		       calendar-month-name-array ["Januar" "Februar" "März"
-						  "April" "Mai" "Juni"
-						  "Juli" "August" "September"
-						  "Oktober" "November" "Dezember"])))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package calendar
+    :defer t
+    :config (progn
+	      (setq calendar-week-start-day 1
+		    calendar-day-name-array ["Sonntag" "Montag" "Dienstag" "Mittwoch"
+					     "Donnerstag" "Freitag" "Samstag"]
+		    calendar-month-name-array ["Januar" "Februar" "März"
+					       "April" "Mai" "Juni"
+					       "Juli" "August" "September"
+					       "Oktober" "November" "Dezember"])))
+#+END_SRC
 ** Dunkles Theme laden
 #+begin_src emacs-lisp
   (load-theme 'modus-vivendi)
@@ -75,6 +78,11 @@ Das Package =use-package= benötigt diminish, damit =:diminish= funktioniert.
   (use-package diminish
     :ensure t)
 #+end_src
+** Deaktiviere Tabs
+Nutze Leerzeichen anstelle von Tabs:
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+end_src
 * Packages
 ** Ivy
    #+BEGIN_SRC emacs-lisp
@@ -83,18 +91,10 @@ Das Package =use-package= benötigt diminish, damit =:diminish= funktioniert.
        :config
        (ivy-mode 1))
    #+END_SRC
-** Elpy
-   #+BEGIN_SRC emacs-lisp
-     (use-package elpy
-       :ensure t
-       :init
-       (elpy-enable)
-       :config
-       (setq elpy-rpc-python-command "python3"))
-   #+END_SRC
 ** Magit
    #+begin_src emacs-lisp
      (use-package magit
+       :commands (magit-status magit)
        :ensure t)
    #+end_src
 
@@ -124,17 +124,17 @@ Das Package =use-package= benötigt diminish, damit =:diminish= funktioniert.
        :init (setq markdown-command "multimarkdown"))
 
      (use-package impatient-mode
+       :defer t
        :ensure t)
 
      (defun markdown-html (buffer)
-  "Convert markdown to html.
+       "Convert markdown to html.
 Use BUFFER"
-  (princ (with-current-buffer buffer
-	   (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>"
-                   (buffer-substring-no-properties (point-min) (point-max))))
-         (current-buffer)))
+       (princ (with-current-buffer buffer
+         (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>"
+                 (buffer-substring-no-properties (point-min) (point-max))))
+	   (current-buffer)))
    #+end_src
-
 ** Snippets
    #+begin_src emacs-lisp
      (use-package yasnippet
@@ -222,6 +222,7 @@ Use BUFFER"
        )
 
      (use-package clang-format
+       :after c++-mode
        :ensure t)
 
      (global-set-key (kbd "C-c C-f") 'clang-format-region)
@@ -243,7 +244,7 @@ Use BUFFER"
    #+begin_src emacs-lisp
      (use-package flycheck
        :ensure t
-       :diminish flycheck-mode
+       ;;:diminish flycheck-mode
        :hook (prog-mode . flycheck-mode)
        :init
        ;; Aktiviere Flycheck überall ausser in Org Mode
@@ -265,6 +266,11 @@ Use BUFFER"
    AuCTeX
    #+begin_src emacs-lisp
      (use-package tex
+       :mode
+       ("\\.tex\\'" . latex-mode)
+       :config
+       (add-hook 'LaTeX-mode-hook #'turn-on-flyspell)
+       (add-hook 'LaTeX-mode-hook #'visual-line-mode)
        :ensure auctex)
    #+end_src
 *** Company AuCTeX
@@ -272,7 +278,7 @@ Use BUFFER"
     #+begin_src emacs-lisp
       (use-package company-auctex
 	:ensure t
-	:after (auctex company)
+	:after (auctex)
 	:config (company-auctex-init))
     #+end_src
 ** Firefox Addon: Edit with Emacs
@@ -297,7 +303,9 @@ Use BUFFER"
 ** Org Mode
    #+begin_src emacs-lisp
      (use-package org
-       :ensure t
+       :ensure nil
+       :mode
+       ("\\.org\\'" . org-mode)
        :config (progn
 		 ;; Syntax highlighting für die Sprache im Codeblock
 		 (setq org-src-fontify-natively t)))
@@ -321,10 +329,10 @@ Use BUFFER"
        (setq rustic-format-on-save t))
    #+end_src
 ** LSP
-   LSP (Language Server Protocol) mode
+LSP (Language Server Protocol) mode
 
-   A code completion, syntax checker, etc. engine that uses the LSP to talk to
-   completion servers.
+A code completion, syntax checker, etc. engine that uses the LSP to talk to
+completion servers.
 *** Abhängigkeiten
     | Sprache   | Abhängigkeit        | Gentoo                               | Kali                        |
     |-----------+---------------------+--------------------------------------+-----------------------------|
@@ -397,9 +405,20 @@ Use BUFFER"
     #+begin_src emacs-lisp
       (use-package lsp-ivy
 	:ensure t
+	:after lsp-mode
 	:commands lsp-ivy-workspace-symbol)
 
       (use-package lsp-treemacs
 	:ensure t
+	:after lsp-mode
 	:commands lsp-treemacs-error-list)
     #+end_src
+** Ement: Matrix Chat Client
+Ein Chat Client für Matrix
+#+begin_src emacs-lisp
+  (use-package ement
+    :ensure t
+    :defer t
+    :custom
+    (ement-save-sessions t))
+#+end_src
