@@ -304,11 +304,25 @@ Use BUFFER"
    #+begin_src emacs-lisp
      (use-package org
        :ensure nil
+       :bind (("C-c a" . org-agenda))
+       :hook (org-mode . visual-line-mode)
        :mode
        ("\\.org\\'" . org-mode)
        :config (progn
-		 ;; Syntax highlighting für die Sprache im Codeblock
-		 (setq org-src-fontify-natively t)))
+                 ;; Syntax highlighting für die Sprache im Codeblock
+                 (setq org-src-fontify-natively t)
+                 (setq org-latex-listings 'minted
+                       org-latex-packages-alist '(("" "minted"))
+                       org-latex-pdf-process
+                       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+                 (setq org-latex-minted-options '(("breaklines" "true")
+                                                  ("breakanywhere" "true")))
+                 (add-to-list 'org-latex-packages-alist
+                              '("AUTO" "babel" t ("pdflatex" "lualatex")))
+                 (add-to-list 'org-latex-packages-alist
+                              '("AUTO" "polyglossia" t ("xelatex" "lualatex")))
+                 ))
    #+end_src
 ** Rustic
    Rust Mode
@@ -421,4 +435,26 @@ Ein Chat Client für Matrix
     :defer t
     :custom
     (ement-save-sessions t))
+#+end_src
+** YAML
+#+begin_src emacs-lisp
+  (use-package yaml-mode
+    :ensure t
+    :mode ("\\.yml\\'" "\\.yaml\\'"))
+#+end_src
+** SLIME Superior Lisp Interaction Mode for Emacs
+Deaktiviert wegen SLY.
+#+begin_src emacs-lisp
+  (use-package slime
+    :ensure t
+    :disabled
+    :config
+    (setq inferior-lisp-program "/usr/bin/sbcl"))
+#+end_src
+** SLY (Sylvester the Cat's Common Lisp IDE for Emacs
+#+begin_src emacs-lisp
+      (use-package sly
+        :ensure t
+        :config
+        (setq inferior-lisp-program "/usr/bin/sbcl"))
 #+end_src
