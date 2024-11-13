@@ -263,16 +263,25 @@ Use BUFFER"
        :mode ("\\.s\\'"))
    #+end_src
 ** LaTeX
-   AuCTeX
-   #+begin_src emacs-lisp
-     (use-package tex
-       :mode
-       ("\\.tex\\'" . latex-mode)
-       :config
-       (add-hook 'LaTeX-mode-hook #'turn-on-flyspell)
-       (add-hook 'LaTeX-mode-hook #'visual-line-mode)
-       :ensure auctex)
-   #+end_src
+AuCTeX
+#+begin_src emacs-lisp
+  (use-package tex
+    :mode
+    ("\\.tex\\'" . latex-mode)
+    :init
+    (setq reftex-plug-into-AUCTeX t
+          ; Speichert geparste Informationen und soll gut für Multifile sein
+          ; https://www.gnu.org/software/auctex/manual/auctex/Parsing-Files.html
+          TeX-auto-save t
+          TeX-parse-self t
+          LaTeX-csquotes-close-quote "}"
+          LaTeX-csquotes-open-quote "\\enquote{")
+    :config
+    (add-hook 'LaTeX-mode-hook #'turn-on-flyspell)
+    (add-hook 'LaTeX-mode-hook #'visual-line-mode)
+    (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
+    :ensure auctex)
+#+end_src
 *** Company AuCTeX
     Für autocomplete
     #+begin_src emacs-lisp
@@ -446,7 +455,7 @@ Ein Chat Client für Matrix
 Deaktiviert wegen SLY.
 #+begin_src emacs-lisp
   (use-package slime
-    :ensure t
+    ; :ensure t
     :disabled
     :config
     (setq inferior-lisp-program "/usr/bin/sbcl"))
