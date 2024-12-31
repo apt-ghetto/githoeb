@@ -451,15 +451,6 @@ Ein Chat Client für Matrix
     :ensure t
     :mode ("\\.yml\\'" "\\.yaml\\'"))
 #+end_src
-** SLIME Superior Lisp Interaction Mode for Emacs
-Deaktiviert wegen SLY.
-#+begin_src emacs-lisp
-  (use-package slime
-    ; :ensure t
-    :disabled
-    :config
-    (setq inferior-lisp-program "/usr/bin/sbcl"))
-#+end_src
 ** SLY (Sylvester the Cat's Common Lisp IDE for Emacs
 #+begin_src emacs-lisp
       (use-package sly
